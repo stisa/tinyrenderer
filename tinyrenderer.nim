@@ -1,38 +1,6 @@
 import pnghelper,objparser,matutils
 
-proc drawlineOld*(srf:var Image, x1,y1,x2,y2:int, color : Color = Red) =
-  ## Draws a line between x1,y1 and x2,y2. Uses Bresenham's line algorithm.
-  var dx = x2-x1
-  var dy = y2-y1
-   
-  let ix = if dx > 0 : 1 elif dx<0 : -1 else: 0
-  let iy = if dy > 0 : 1 elif dy<0 : -1 else: 0
-  dx = abs(dx) shl 1
-  dy = abs(dy) shl 1
-  var xi = x1
-  var yi = y1
-  srf[xi,yi] = color
-       
-  if dx>=dy:
-    var err = dy-(dx shr 1)
-    while xi != x2:
-      if (err >= 0):
-        err -= dx
-        yi+=iy
-      err += dy
-      xi += ix
-      srf[xi,yi] = color
-  else:
-    var err = dx - (dy shr 1)
-    while yi!=y2:
-      if err >= 0:
-        err -= dy
-        xi += ix
-      err += dx
-      yi += iy
-      srf[xi,yi] = color
-
-proc drawline*(srf:var Image, x1,y1,x2,y2:int, color : Color = White) =
+proc line*(srf:var Image, x1,y1,x2,y2:int, color : Color = White) =
   ## Draws a line between x1,y1 and x2,y2. Uses Bresenham's line algorithm.
   #echo("x$1 y$2 x$3 y$4" % [$x1,$y1,$x2,$y2])
   var steep :bool
@@ -67,7 +35,6 @@ proc drawline*(srf:var Image, x1,y1,x2,y2:int, color : Color = White) =
       e2 -= dx*2
 
 proc wireframe(srf:var Image,m:Objmodel) =
-  
   var 
     v0,v1 :Vertex
     x0,y0,x1,y1 :int
@@ -80,7 +47,7 @@ proc wireframe(srf:var Image,m:Objmodel) =
     y0 = (v0.y+0.0).int
     x1 = (v1.x+0.0).int
     y1 = (v1.y+0.0).int
-    srf.drawline(x0,y0,x1,y1)
+    srf.line(x0,y0,x1,y1)
 
     #echo "y->z"
     v0 = srf.center((m.verts[f.v.y ]))
@@ -90,7 +57,7 @@ proc wireframe(srf:var Image,m:Objmodel) =
     y0 = (v0.y+0.0).int
     x1 = (v1.x+0.0).int
     y1 = (v1.y+0.0).int
-    srf.drawline(x0,y0,x1,y1)
+    srf.line(x0,y0,x1,y1)
     
     #echo "z->x"
     v0 = srf.center((m.verts[ f.v.z ]))
@@ -100,7 +67,7 @@ proc wireframe(srf:var Image,m:Objmodel) =
     y0 = (v0.y+0.0).int
     x1 = (v1.x+0.0).int
     y1 = (v1.y+0.0).int
-    srf.drawline(x0,y0,x1,y1)
+    srf.line(x0,y0,x1,y1)
   
 proc debugDraw(name:string)=
   var model = loadObj("models/"&name)
