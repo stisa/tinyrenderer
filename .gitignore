@@ -4,3 +4,6 @@ nimcache
 *.txt
 *.log
 *.exe
+*.html
+*.js
+!models/african_head.obj.png
