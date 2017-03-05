@@ -1,5 +1,3 @@
-import os, strutils
-from nimPNG import savepng32
 import pnghelper,objparser,matutils
 
 proc drawlineOld*(srf:var Image, x1,y1,x2,y2:int, color : Color = Red) =
