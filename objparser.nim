@@ -1,4 +1,6 @@
 import strutils
+when defined js:
+  import ../ajax/src/ajax,dom
 
 type Vertex* = tuple[x,y,z:float]
 type IntVertex* = tuple[x,y,z:int]
@@ -25,10 +27,27 @@ proc `$`*(om:ObjModel):string =
   for f in om.faces: result.add($f & "\n")
 
 proc loadObjString*(f:string):string =
-  try:
-    result = readFile(f)
-  except :
-    raise
+  when defined js:
+    var httpRequest = newXMLHttpRequest()
+
+    if httpRequest.isNil:
+      window.alert("Giving up :( Cannot create an XMLHTTP instance")
+      return
+    proc resultcontent(e:Event) =
+      if httpRequest.readyState == rsDONE:
+        if httpRequest.status == 200:
+          result = $(httpRequest.responseText)
+        else:
+          window.alert("There was a problem with the request.")
+    httpRequest.onreadystatechange = resultcontent
+    httpRequest.open("GET", f,false)
+    httpRequest.send()
+  else:
+    try:
+      result = readFile(f)
+    except :
+      raise
+    
 proc parseint(s:string):int =
   if s.len == 0 : 0
   else: strutils.parseint(s) 
@@ -49,7 +68,7 @@ proc parseObj(obj:string):ObjModel =
     header = sln[0].strip
     if header == "#" : continue
     if header in ["vt", "vn", "g", "s", " "]: continue # skip unimplemented
-    assert(sln.len == 4, "Wrong vertex length at line: "& $i & "> " & $sln & " header:"& repr header)
+    assert(sln.len == 4, "Wrong vertex length at line: "& $i & "> " & $sln & " header:"& header)
     if header == "v" : # vertex
       result.verts.add( (sln[1].parsefloat,sln[2].parsefloat,sln[3].parsefloat) )    
     elif header == "f" : # face
@@ -75,3 +94,4 @@ v 0.355059 0.467372 0.356967
 f 712/733/712 720/738/720 721/739/721
 f 712/733/712 721/739/721 713/730/713
   """)
+  echo loadObj("models/cube.obj")
