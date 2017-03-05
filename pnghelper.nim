@@ -37,6 +37,8 @@ proc `$`*(c:Color):string =
   result[3] = cast[uint8](c shr 0).char
 
 proc `[]=`*(im:var Image,i,j:int,val:Color) =
+  assert(j*im.width+i < im.data.len, $(j*im.width+i) & "is greater than " & $im.data.len)
+  assert(j*im.width+i >= 0, $(j*im.width+i) & "is less than 0")
   im.data[j*im.width+i] = val
 
 proc initImg*(w,h:int) :Image =

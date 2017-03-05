@@ -6,6 +6,8 @@ type Face* = tuple[v,vt,vn:IntVertex]
 
 type ObjModel* = object
   verts* : seq[Vertex]
+  normals* : seq[Vertex]
+  tangents* : seq[Vertex]
   faces* : seq[Face] # vertex/vertextexture/vertexnormal
 
 proc `$`*(v:Vertex|IntVertex):string = 
@@ -30,20 +32,28 @@ proc loadObjString*(f:string):string =
 proc parseObj(obj:string):ObjModel =
   result.verts = newseq[Vertex]()
   result.faces = newseq[Face]()
+  
+  var i = 0
+  var header : string = ""
 
   for ln in obj.strip.splitLines:
+    inc i
     let sln = ln.split(" ")
-    assert(sln.len == 4, "Wrong vertex length")
-    if sln[0] == "v" : # vertex
+    if sln.len == 0 : continue # skip comments
+    header = sln[0].strip
+    if header == "#" : continue
+    if header in ["vt", "vn", "g", "s"]: continue # skip unimplemented
+    assert(sln.len == 4, "Wrong vertex length at line: "& $i & "> " & $sln)
+    if header == "v" : # vertex
       result.verts.add( (sln[1].parsefloat,sln[2].parsefloat,sln[3].parsefloat) )    
-    elif sln[0] == "f" : # face
+    elif header == "f" : # face
       let v1 = sln[1].split("/")
       let v2 = sln[2].split("/")
       let v3 = sln[3].split("/")
       result.faces.add( 
-        (( v1[0].parseint,v2[0].parseint,v3[0].parseint ), # v
-         ( v1[1].parseint,v2[1].parseint,v3[1].parseint ), # vt
-         ( v1[2].parseint,v2[2].parseint,v3[2].parseint )) # vn
+        (( v1[0].parseint - 1, v2[0].parseint - 1, v3[0].parseint - 1 ), # v
+         ( v1[1].parseint - 1, v2[1].parseint - 1, v3[1].parseint - 1 ), # vt
+         ( v1[2].parseint - 1, v2[2].parseint - 1, v3[2].parseint - 1 )) # vn
       )    
     else: doassert(false,"Unknown line prefix: "&ln)
 
