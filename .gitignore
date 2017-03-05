@@ -1,4 +1,6 @@
 nimcache
 *.obj
+*.png
+*.txt
 *.log
 *.exe
