@@ -36,10 +36,13 @@ proc `$`*(c:Color):string =
   result[2] = cast[uint8](c shr 8).char
   result[3] = cast[uint8](c shr 0).char
 
-proc `[]=`*(im:var Image,i,j:int,val:Color) =
-  assert(j*im.width+i < im.data.len, $(j*im.width+i) & "is greater than " & $im.data.len)
-  assert(j*im.width+i >= 0, $(j*im.width+i) & "is less than 0")
-  im.data[j*im.width+i] = val
+proc `[]=`*(im:var Image,x,y:int,val:Color) =
+  #assert(j*im.width+i < im.data.len, $(j*im.width+i) & "is greater than " & $im.data.len)
+  if y<0 or x<0 or y>=im.height or x>=im.width: 
+    when defined debug: echo "tried to draw out of image, skipping"
+    return
+  #assert(j*im.width+i >= 0, $(j*im.width+i) & "is less than 0")
+  im.data[y*im.width+x] = val
 
 proc initImg*(w,h:int) :Image =
   result.width = w

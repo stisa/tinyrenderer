@@ -2,7 +2,8 @@ import strutils
 
 type Vertex* = tuple[x,y,z:float]
 type IntVertex* = tuple[x,y,z:int]
-type Face* = tuple[v,vt,vn:IntVertex]
+type Face* = object
+  v*,vt*,vn*:IntVertex
 
 type ObjModel* = object
   verts* : seq[Vertex]
@@ -59,9 +60,9 @@ proc parseObj(obj:string):ObjModel =
       v2.setLen(3)
       v3.setLen(3)
       result.faces.add( 
-        (( v1[0].parseint - 1, v2[0].parseint - 1, v3[0].parseint - 1 ), # v
-         ( v1[1].parseint - 1, v2[1].parseint - 1, v3[1].parseint - 1 ), # vt
-         ( v1[2].parseint - 1, v2[2].parseint - 1, v3[2].parseint - 1 )) # vn
+        Face(v: ( v1[0].parseint - 1, v2[0].parseint - 1, v3[0].parseint - 1 ), 
+             vt:( v1[1].parseint - 1, v2[1].parseint - 1, v3[1].parseint - 1 ), 
+             vn:( v1[2].parseint - 1, v2[2].parseint - 1, v3[2].parseint - 1 ))
       )   
     else: doassert(false,"Unknown line prefix: "&ln)
 
