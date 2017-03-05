@@ -1,4 +1,4 @@
-import os, strutils, jester
+import os, strutils
 from nimPNG import savepng32
 import pnghelper,objparser
 
@@ -36,6 +36,7 @@ proc drawlineOld*(srf:var Image, x1,y1,x2,y2:int, color : Color = Red) =
 
 proc drawline*(srf:var Image, x1,y1,x2,y2:int, color : Color = Red) =
   ## Draws a line between x1,y1 and x2,y2. Uses Bresenham's line algorithm.
+  #echo ("x$1 y$2 x$3 y$4" % [$x1,$y1,$x2,$y2])
   var steep :bool
   var 
     xx1 = x1
@@ -70,41 +71,48 @@ proc wireframe*(srf:var Image, om:ObjModel) =
   let h2 = srf.height div 2
   var v0,v1:Vertex
   var x0,x1,y0,y1: int
-  echo len om.faces
+  #echo len om.faces
   for f in om.faces:
-    # x->y
-    assert(om.verts.len>f.v.y, $f.v.y & "  " & $om.verts.len)
+    #echo "x->y"
+    #assert(om.verts.len>f.v.y, $f.v.y & "  " & $om.verts.len)
     v0 = om.verts[f.v.x]
     v1 = om.verts[f.v.y]
     
-    x0 = (v0.x+1.0).int*w2
-    y0 = (v0.y+1.0).int*h2
-    x1 = (v1.x+1.0).int*w2
-    y1 = (v1.y+1.0).int*h2
+    x0 = (v0.x+0.0).int+w2
+    y0 = (v0.y+0.0).int+h2
+    x1 = (v1.x+0.0).int+w2
+    y1 = (v1.y+0.0).int+h2
     srf.drawline(x0,y0,x1,y1)
-    # y->z
-    v0 = om.verts[ f.v.y ]
+
+    #echo "y->z"
+    v0 = om.verts[f.v.y ]
     v1 = om.verts[f.v.z]
     
-    x0 = (v0.x+1.0).int*w2
-    y0 = (v0.y+1.0).int*h2
-    x1 = (v1.x+1.0).int*w2
-    y1 = (v1.y+1.0).int*h2
+    x0 = (v0.y+0.0).int+w2
+    y0 = (v0.z+0.0).int+h2
+    x1 = (v1.y+0.0).int+w2
+    y1 = (v1.z+0.0).int+h2
     srf.drawline(x0,y0,x1,y1)
-    # z->x
+    
+    #echo "z->x"
     v0 = om.verts[ f.v.z ]
     v1 = om.verts[f.v.x]
     
-    x0 = (v0.x+1.0).int*w2
-    y0 = (v0.y+1.0).int*h2
-    x1 = (v1.x+1.0).int*w2
-    y1 = (v1.y+1.0).int*h2
+    x0 = (v0.z+0.0).int+w2
+    y0 = (v0.x+0.0).int+h2
+    x1 = (v1.z+0.0).int+w2
+    y1 = (v1.x+0.0).int+h2
     srf.drawline(x0,y0,x1,y1)
   
-when ismainmodule:
-  let model = loadObj("models/cube.obj")
+proc debugDraw(name:string)=
+  let model = loadObj("models/"&name)
+  writefile("models/" & name & ".txt",$model)
   var img = initImg(640,480)
   img.fillWith(Black)
-  #img.wireframe(model)
-  img.drawline(0,0,640,480)
-  img.saveto("models/cube.png")
+  img.wireframe(model)
+  #img.drawline(0,0,640,480)
+  img.saveto("models/" & name & ".png")
+when ismainmodule:
+  debugDraw("cube.obj")
+  debugDraw("diamond.obj")
+  debugDraw("african_head.obj")
