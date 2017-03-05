@@ -1,0 +1,4 @@
+nimcache
+*.obj
+*.log
+*.exe
