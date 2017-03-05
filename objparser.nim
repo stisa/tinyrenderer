@@ -1,12 +1,12 @@
 import strutils
 
-type Vertex = tuple[x,y,z:float]
-type IntVertex = tuple[x,y,z:int]
-type Face = tuple[v,vt,vn:IntVertex]
+type Vertex* = tuple[x,y,z:float]
+type IntVertex* = tuple[x,y,z:int]
+type Face* = tuple[v,vt,vn:IntVertex]
 
-type ObjModel = object
-  verts : seq[Vertex]
-  faces : seq[Face] # vertex/vertextexture/vertexnormal
+type ObjModel* = object
+  verts* : seq[Vertex]
+  faces* : seq[Face] # vertex/vertextexture/vertexnormal
 
 proc `$`*(v:Vertex|IntVertex):string = 
   "v $1 $2 $3" % [$v.x, $v.y, $v.z]
