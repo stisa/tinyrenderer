@@ -47,6 +47,7 @@ proc parseObj(obj:string):ObjModel =
       )    
     else: doassert(false,"Unknown line prefix: "&ln)
 
+proc loadObj*(f:string):ObjModel = f.loadObjString.parseObj
 
 when ismainmodule:
   echo parseObj(r"""
